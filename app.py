@@ -138,8 +138,7 @@ st.markdown("<div class='decoration floating-element floating-element-3'>Upload 
 
 # File uploader
 uploaded_file = st.file_uploader("Choose an X-ray image...", type=["jpg", "jpeg", "png"])
-
-model = load_model("/Users/harshsoni2003/Downloads/Final/model/recognition_model.keras")
+model = load_model("model/recognition_model.keras")
 
 data_label= ['fractured', 'not fractured']
 
