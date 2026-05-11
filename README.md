@@ -118,20 +118,4 @@ If you want, I can also give you:
 - a **shorter professional README**
 - or a **GitHub-ready README with badges and screenshots section**
 
-Sources
-[1] Run your Streamlit app https://docs.streamlit.io/develop/concepts/architecture/run-your-app
-[2] Whole model saving & loading - Keras https://keras.io/api/models/model_saving_apis/model_saving_and_loading/
-[3] Streamlit • A faster way to build and share data apps https://streamlit.io
-[4] Install Streamlit https://docs.streamlit.io/get-started/installation
-[5] Streamlit - Complete Setup Guide https://www.geeksforgeeks.org/python/streamlit-introduction-and-setup/
-[6] Step by Step Running | PDF https://id.scribd.com/document/918674495/Step-by-Step-Running
-[7] Import trained LSTM model on Streamlit https://stackoverflow.com/questions/78254579/import-trained-lstm-model-on-streamlit
-[8] streamlit/README.md at develop · streamlit/streamlit https://github.com/streamlit/streamlit/blob/develop/README.md
-[9] Install Streamlit using command line https://docs.streamlit.io/get-started/installation/command-line
-[10] GitHub - cedanl/streamlit-app-template: ✨ [NEW] - A production-ready template for building & deploying Streamlit apps with best practices and essential configurations. ⚡ Runs with uv https://github.com/cedanl/streamlit-app-template
-[11] Streamlit https://pypi.org/project/streamlit/
-[12] Create a Web App from Your TensorFlow Neural Network and Embed it in Medium.com https://drlee.io/create-a-web-app-from-your-tensorflow-neural-network-and-embedding-it-in-medium-com-4b4b8501cccc?gi=c558f586ac3e
-[13] GitHub - OmarAlkousa/Learn-Streamlit: This repository is to represent how easy to design a web app using the Streamlit package. The best way to learn is to practice... https://github.com/OmarAlkousa/Learn-Streamlit
-[14] Loading Keras models - Using Streamlit https://discuss.streamlit.io/t/loading-keras-models/7289
-[15] Unable to load my saved model using tensorflow keras https://discuss.streamlit.io/t/unable-to-load-my-saved-model-using-tensorflow-keras/13026
-# Bone-Fracture-Detection-Using-Deep-Learning
+
