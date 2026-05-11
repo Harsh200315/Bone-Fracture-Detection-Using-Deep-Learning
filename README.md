@@ -95,27 +95,3 @@ streamlit run app.py
 ## License
 
 This project is for educational and research purposes.
-
-***
-
-## Small improvement I recommend
-Your current `app.py` uses an absolute local path for the model:
-
-```python
-model = load_model("/Users/harshsoni2003/Downloads/Final/model/recognition_model.keras")
-```
-
-For GitHub and portability, change it to a relative path like:
-
-```python
-model = load_model("model/recognition_model.keras")
-```
-
-That will make your README steps work properly on any system.
-
-If you want, I can also give you:
-- a **proper requirements.txt**
-- a **shorter professional README**
-- or a **GitHub-ready README with badges and screenshots section**
-
-
