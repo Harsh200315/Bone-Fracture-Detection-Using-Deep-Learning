@@ -5,201 +5,237 @@ import streamlit as st
 from PIL import Image
 import io
 import time
+import os
 
+# --- PAGE CONFIGURATION & STYLING ---
+st.set_page_config(page_title="Fracture Detection AI", layout="wide")
 
-st.markdown(
-        """
-        <style>
-        .stApp {
-                background-image: url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSxxkV_AVtgPh8j2gfH_UpwKPodmiQaXiarTw&s");
-                background-size: cover;
-                background-position: center;
-        }
-        .stMainBlockContainer.ea3mdgi5{
-                max-width:100%;
-                padding: 0;
-                margin: 0;
-        }
-        header {
-                color: ; black
-                padding: 10px;
-        }
-        .header-background{
-                background-image: url("https://www.shutterstock.com/image-photo/xray-image-ankle-fracture-blue-260nw-2253312433.jpg");
-                background-size: cover;
-                background-position: center;
-                height: 100vh;
-                text-align: end;
-                align-content: center;
-                padding-right: 20px;
-                text-decoration:none;
-                clip-path: inset(0 0 35px 0);
-        }
-        .hero-section > p{
-                padding-right: 20px;
-        }
-        .stFileUploader {
-                width: 70%;
-                margin: 0 auto;
-        }
-        .section-title {
-                color:white;
-                font-size: 30px;
-                font-weight: bold;
-                margin-top: 40px;
-                width: 70%;
-                margin: auto;
-        }
-        .section-subtitle {
-                color:white;
-                font-size: 18px;
-                font-weight: normal;
-                margin-top: -10px;
-                width: 70%;
-                margin: auto;
-                margin-bottom:10px;
-        }
-        .decoration{
-                text-align: center;
-                text-decoration: overline;
-                margin-top: 3%;
-                font-size: 30px;
-                font-weight: 800;
-        }
-        .stHorizontalBlock.st-emotion-cache-ocqkz7.e1f1d6gn5{
-                width: 70%;
-                margin: auto;
-        }
-        .st-emotion-cache-1xf0csu.e115fcil1 > img{
-                height: 300px;
-        }
-        #root > div:nth-child(1) > div.withScreencast > div > div > section > div.stMainBlockContainer.block-container.st-emotion-cache-13ln4jf.ea3mdgi5 > div > div > div > div:nth-child(5) > div.stColumn.st-emotion-cache-fplge5.e1f1d6gn3 > div{
-                width: 100%;
-        }
-        .footer {
-                color: #ffff;
-                background-color:black;
-                text-align: center;
-                margin-top: 50px;
-                font-size: 16px;
-                padding:12px;
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-)
-
-
-# CSS for floating effect
 st.markdown(
     """
     <style>
-    /* Floating animation */
-    @keyframes floatIn {
-        from {
-            transform: translateY(30px);
-            opacity: 0;
-        }
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
+    /* Medical X-Ray Background with Light Overlay for perfect readability */
+    .stApp {
+        background: linear-gradient(rgba(240, 244, 248, 0.85), rgba(240, 244, 248, 0.95)),
+                    url("https://www.shutterstock.com/image-photo/xray-image-ankle-fracture-blue-260nw-2253312433.jpg") no-repeat center center fixed;
+        background-size: cover;
     }
 
-    /* Apply animation to wrapper div */
-    .floating-element {
-        animation: floatIn 1.5s ease-out forwards;
-        opacity: 0;
+    /* Remove top padding */
+    .stMainBlockContainer {
+        padding-top: 0 !important;
     }
 
-    /* Delay for staggered animation */
-    .floating-element-1 { animation-delay: 0.2s; }
-    .floating-element-2 { animation-delay: 0.4s; }
-    .floating-element-3 { animation-delay: 1.4s; }
-    .floating-element-4 { animation-delay: 1.8s; }
+    /* Deep Blue Header */
+    .custom-header {
+        background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+        padding: 3rem 2rem;
+        text-align: center;
+        border-bottom-left-radius: 20px;
+        border-bottom-right-radius: 20px;
+        margin-bottom: 3rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
 
+    .custom-header h1 {
+        color: #ffffff;
+        font-size: 3rem;
+        font-weight: 800;
+        margin: 0;
+        padding-bottom: 10px;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .custom-header p {
+        color: #e0f2fe;
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    /* Target the uploaded X-ray image to match the result card styling */
+    [data-testid="stImage"] img {
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* Results Card */
+    .result-card {
+        background-color: rgba(255, 255, 255, 0.9);
+        border-radius: 12px;
+        padding: 2.5rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        border: 1px solid rgba(255,255,255,0.5);
+        text-align: center;
+        color: #1e293b;
+        height: 100%;
+        backdrop-filter: blur(10px);
+    }
+
+    .result-card h3 {
+        color: #64748b;
+        font-size: 1.1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1.5rem;
+    }
+
+    .highlight-fracture {
+        color: #dc2626;
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 10px 0;
+    }
+
+    .highlight-normal {
+        color: #16a34a;
+        font-size: 2rem;
+        font-weight: 900;
+        margin: 10px 0;
+    }
+
+    .confidence-box {
+        background-color: #f8fafc;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin: 2rem 0;
+        border: 1px solid #e2e8f0;
+    }
+
+    .confidence-box p {
+        margin: 0;
+        color: #334155;
+    }
+
+    .confidence-value {
+        font-size: 1.8rem !important;
+        font-weight: bold;
+        color: #0f172a !important;
+    }
+
+    /* Section Titles */
+    .section-title {
+        text-align: center;
+        color: #0f172a;
+        font-size: 1.8rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: #475569;
+        margin-bottom: 2rem;
+    }
+
+    /* Footer */
+    .custom-footer {
+        text-align: center;
+        color: #475569;
+        padding: 2rem;
+        margin-top: 4rem;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        font-size: 0.9rem;
+    }
     </style>
     """,
     unsafe_allow_html=True
 )
 
+# --- HEADER ---
+st.markdown("<div class='custom-header'><h1>Fracture Detection AI</h1><p>Advanced Deep Learning Analysis for Radiographic Imaging</p></div>", unsafe_allow_html=True)
 
-# header
-st.markdown('''<header class='header-background full-width-header '>
-                        <div class='hero-section floating-element floating-element-1'><h1>Fracture Detection in X-ray Images</h1>
-                                <p class='hero-section floating-element floating-element-2'>An AI-powered application to assist in detecting fractures from X-ray images.</p>
-                        </div>
-                </header>''',
-               unsafe_allow_html=True)
+# --- MODEL LOADING (CACHED) ---
+@st.cache_resource
+def load_keras_model():
+    model_path = "model/recognition_model.keras"
+    if not os.path.exists(model_path):
+        st.error(f"Model file not found at {model_path}. Please check the path.")
+        st.stop()
+    
+    # Explicitly tell TensorFlow where to find the missing preprocessing function
+    custom_objects_dict = {
+        'preprocess_input': tf.keras.applications.vgg16.preprocess_input
+    }
+    
+    try:
+        # Load the model and inject the missing function
+        return load_model(
+            model_path, 
+            custom_objects=custom_objects_dict, 
+            compile=False, 
+            safe_mode=False
+        )
+    except TypeError:
+        # Fallback for slightly older versions of TensorFlow
+        return load_model(
+            model_path, 
+            custom_objects=custom_objects_dict, 
+            compile=False
+        )
 
-
-
-st.markdown("<div class='decoration floating-element floating-element-3'>Upload an X-ray Image </div>",unsafe_allow_html=True)
-
-# File uploader
-uploaded_file = st.file_uploader("Choose an X-ray image...", type=["jpg", "jpeg", "png"])
-model = load_model("model/recognition_model.keras")
-
-data_label= ['fractured', 'not fractured']
-
+model = load_keras_model()
+data_label = ['fractured', 'not fractured']
 image_height = 256
 image_width = 256
 
-# Run classification if an image is uploaded
+# --- MAIN APP LOGIC ---
+st.markdown("<div class='section-title'>Initialize Scan Analysis</div>", unsafe_allow_html=True)
+
+up_col1, up_col2, up_col3 = st.columns([1, 2, 1])
+with up_col2:
+    uploaded_file = st.file_uploader("", type=["jpg", "jpeg", "png"])
+
 if uploaded_file is not None:
-        try:
-                # Columns layout
-                col1, col2 = st.columns([3, 2])
+    try:
+        st.markdown("<br>", unsafe_allow_html=True)
 
-                with col1:
-                        # spinner
-                        with st.spinner("Processing the uploaded image..."):
-                                time.sleep(1)
+        # FIX 1: Tighter grid layout [1, 3, 3, 1] to push the image and results box closer together
+        col1, col2, col3, col4 = st.columns([1, 3, 3, 1])
 
-                        # reading image
-                        image = Image.open(io.BytesIO(uploaded_file.read()))
-                        if image.mode != "RGB":
-                                image = image.convert("RGB")
+        with col2:
+            with st.spinner("Processing neural network layers..."):
+                time.sleep(1)
 
-                        img_arr = np.array(image.resize((image_height,image_width)))
-                        img_arr = np.array(img_arr.reshape((1,image_height,image_width,3)))
+            image = Image.open(io.BytesIO(uploaded_file.read()))
+            if image.mode != "RGB":
+                image = image.convert("RGB")
 
-                        predict = model.predict(img_arr)
+            img_arr = np.array(image.resize((image_width, image_height)))
+            img_arr = img_arr.reshape((1, image_height, image_width, 3))
 
-                        # Use softmax to get probabilities for each class
-                        probabilities = tf.nn.softmax(predict)
+            predict = model.predict(img_arr)
+            predicted_class = np.argmax(predict)
+            confidence = np.max(predict) * 100
 
-                        # Get the predicted class
-                        predicted_class = np.argmax(probabilities)
+            st.image(image, use_container_width=True) # Removed the unaligned caption
 
-                        # Display the uploaded image
-                        st.image(image, caption="Uploaded X-ray Image")
+        with col3:
+            result_class = "highlight-fracture" if predicted_class == 0 else "highlight-normal"
+            display_text = "FRACTURE DETECTED" if predicted_class == 0 else "NO FRACTURE DETECTED"
 
-                with col2:
-                        # Display Result
-                        st.subheader("Detection Result")
+            st.markdown(f"<div class='result-card'><h3>Analysis Complete</h3><p style='color: #475569; font-size: 1.1rem; margin-bottom: 5px;'>Diagnostic Status</p><p class='{result_class}'>{display_text}</p><div class='confidence-box'><p>AI Confidence Level</p><p class='confidence-value'>{confidence:.1f}%</p></div><p style='font-size: 0.85rem; color: #64748b; font-style: italic; margin-top: 1rem;'>This result is generated by an automated deep learning model.<br>Always consult a qualified radiologist for official medical diagnoses.</p></div>", unsafe_allow_html=True)
 
-                        st.write("The bone is : ", data_label[predicted_class] )
+    except Exception as e:
+        st.error(f"An error occurred during analysis: {e}")
 
-                        st.write("This result is generated by our deep learning model, trained on X-ray images.")
-        except Exception as e:
-                st.error(f"An error occured :{e}")
+# --- EXAMPLE IMAGES ---
+st.markdown("<br><br><br>", unsafe_allow_html=True)
+st.markdown("<div class='section-title'>Reference Database</div>", unsafe_allow_html=True)
+st.markdown("<div class='section-subtitle'>Sample classifications handled by the model</div>", unsafe_allow_html=True)
 
+# FIX 2: Custom HTML Flexbox to perfectly align and crop the reference images to the exact same size
+st.markdown('''
+<div style="display: flex; gap: 30px; justify-content: center; max-width: 900px; margin: 0 auto;">
+    <div style="flex: 1; text-align: center;">
+        <img src="https://www.shutterstock.com/image-photo/blue-tone-radiograph-on-dark-600nw-2267523647.jpg" style="width: 100%; height: 280px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        <p style="color: #475569; font-weight: bold; margin-top: 15px; font-size: 1.1rem;">Positive: Fracture Present</p>
+    </div>
+    <div style="flex: 1; text-align: center;">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpqwF54Bgvy8KwtTxT7W3mIEjH6MxqqMrYhg&s" style="width: 100%; height: 280px; object-fit: cover; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);">
+        <p style="color: #475569; font-weight: bold; margin-top: 15px; font-size: 1.1rem;">Negative: Normal Bone Structure</p>
+    </div>
+</div>
+''', unsafe_allow_html=True)
 
-
-
-# Example X-ray Images Section
-st.markdown("<div class='section-title floating-element floating-element-4'>Example X-ray Images</div>", unsafe_allow_html=True)
-st.markdown("<div class='section-subtitle'>See what the app detects</div>", unsafe_allow_html=True)
-col1, col2 = st.columns(2)
-with col1:
-        st.image(r"https://www.shutterstock.com/image-photo/blue-tone-radiograph-on-dark-600nw-2267523647.jpg", caption="Fractured X-ray")
-
-with col2:
-        st.image(r"https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTpqwF54Bgvy8KwtTxT7W3mIEjH6MxqqMrYhg&s", caption="Normal X-ray")
-
-
-
-
-# Footer
-st.markdown("<div class='footer'>Trained on a dataset of X_ray images for fracture detection</div>", unsafe_allow_html=True)
+# --- FOOTER ---
+st.markdown("<div class='custom-footer'>Trained on a specialized dataset of X-ray images for automated fracture detection.</div>", unsafe_allow_html=True)
